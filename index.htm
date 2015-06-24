@@ -1,0 +1,209 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Github Club</title>
+    <link rel='stylesheet' href='stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='stylesheets/bootstrap-theme.min.css' />
+    <link rel='stylesheet' href='stylesheets/overrides.css' />
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Github Club</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- either type="text/x-handlebars" or id can be used for template placeholder -->
+    <div class="container" id="github-app"></div>
+
+    <script type="text/x-handlebars">
+      <div class="row">
+        <div class="col-md-12" style="margin-top: 48px">
+          {{ outlet }}
+        </div>
+      </div>
+    </script>
+
+    <!-- landing page of app. Conventionally named 'index' -->
+    <script type="text/x-handlebars" data-template-name="index">
+      <h1>Github Ember Tutorial</h1>
+      <hr />
+      <p>This is the Github explorer for this demo</p>
+
+      <ul>
+        <!-- #each is the keyword that opens the block. Similar to ng-repeat="dev in devs" -->
+        {{#each}}
+        <li>{{#link-to 'user' this.login}}{{name}}{{/link-to}}</a></li> <!-- can use just property of object. Ex: dev.name unnecessary -->
+        {{/each}} <!-- must end the block or you will get a parse error "EXPECTING..OPEN_UNESCAPED, got 'EOF' etc" -->
+      </ul>
+
+      <p>
+        <!-- action keyword in handlebars acts similar to ng-click -->
+        <button class="btn btn-success" {{action 'clicked'}}>Click Me</button>
+      </p>
+
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="user">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="well">
+            <p class="text-center">
+              {{#link-to 'user' this}}<img {{bind-attr src=avatar_url}} style="width: 140px"/>{{/link-to}}
+            </p>
+            <h4>{{#link-to 'user' this}}{{name}}{{/link-to}}</h4>
+            <p>
+              {{company}}<br />
+              {{location}}<br />
+              {{email}}<br />
+            </p>
+            <hr/>
+            <table class="table table-striped">
+              <tr><td>Followers:</td><td>{{followers}}</td></tr>
+              <tr><td>Repos:</td><td>{{public_repos}}</td></tr>
+              <tr><td>Gists:</td><td>{{public_gists}}</td></tr>
+            </table>
+            <p>
+              {{#link-to 'index'}}Back{{/link-to}}
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          {{outlet}}
+        </div> 
+
+      </div>   
+    </script>
+
+    <script type="text/x-handlebars" id="user/index">
+      <h2>{{name}}'s Github</h2>
+      <ul>
+        <li>{{#link-to 'repositories' this}}Repositories{{/link-to}}</a></li>
+        <li><a href="#">New and Events</a></li>
+        <li><a href="#">Gists</a></li>
+      </ul>
+    </script>
+
+    <script type="text/x-handlebars" id="repositories">
+      <ol class="breadcrumb">
+        <li>{{#link-to 'index'}}Devs{{/link-to}}</li>
+        <li>{{#link-to 'user' user}}{{user.name}}{{/link-to}}</li>
+        <li class="active">Repositories</li>
+      </ol>
+
+      <table class="table table-striped">
+        {{#each}}
+          <tr>
+            <td><h4>{{#link-to 'repository' this.name}}{{name}}{{/link-to}}</h4></td>
+          </tr>
+        {{/each}}
+      </table>
+    </script>
+
+    <script type="text/x-handlebars" id="repository">
+
+    <ol class="breadcrumb">
+      <li>{{#link-to 'index'}}Devs{{/link-to}}</li>
+      <li>{{#link-to 'user' user}}{{user.name}}{{/link-to}}</li>
+      <li >{{#link-to 'repositories'}}Repositories{{/link-to}}</li>
+      <li class="active">{{name}}</li>
+    </ol>
+
+      <h1>{{name}} Repo</h1>
+      <p>{{description}}</p>
+      <ul>
+        <li>Language: {{language}}</li>
+        <li>Watchers: {{watchers}}</li>
+        <li>Open Issues: {{watchers}}</li>
+        <li>Clone: <b>{{clone_url}}</b></li>
+        <li>Web: <a {{bind-attr href=html_url}} target=_blank>{{html_url}}</a></li>
+      </ul>
+      <hr/>
+    </script>
+
+  </body>
+</html>
+
+  <script type="text/javascript" src="javascripts/vendor/jquery-1.10.2.js"></script>
+  <script type="text/javascript" src="javascripts/vendor/moment/moment.js"></script>
+  <script type="text/javascript" src="javascripts/vendor/bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="javascripts/vendor/ember/handlebars-1.1.2.js"></script>
+  <script type="text/javascript" src="javascripts/vendor/ember/ember-1.4.0.js"></script>
+
+  <script>
+
+    var devs = [
+      { login: "anthonycorrado", name: "Anthony Corrado"},
+      { login: "robconery", name: "Rob Conery"},
+      { login: "tomdale", name: "Tom Dale"}
+    ]
+
+    window.Github = Ember.Application.create({
+      rootElement: "#github-app",
+      LOG_TRANSITIONS: true
+    });
+
+    Github.IndexRoute = Ember.Route.extend({
+      model: function() {return devs}
+    });
+
+    Github.Router.map(function() {
+      this.resource("user", { path: "users/:login" }, function() {
+        this.resource("repositories");
+        this.resource("repository", {path: "repositories/:reponame"})
+      });
+    });
+
+    Github.UserRoute = Ember.Route.extend({
+      model: function(params) {
+        return Ember.$.getJSON("https://api.github.com/users/" + params.login);
+      }
+    });
+
+    Github.UserIndexRoute = Ember.Route.extend({
+      model: function() {
+        return this.modelFor('user');
+      }
+    });
+
+    Github.RepositoriesRoute = Ember.Route.extend({
+        model: function () {
+            var user = this.modelFor("user");
+            return Ember.$.getJSON(user.repos_url);
+        }
+    });
+
+    Github.RepositoryRoute = Ember.Route.extend({
+      model: function (params) {
+        var user = this.modelFor("user");
+        //build the URL for the Repo call manually
+        var url = "https://api.github.com/repos/" + user.login + "/" + params.reponame;
+        return Ember.$.getJSON(url);
+      }
+    });
+
+    Github.RepositoriesController = Ember.ArrayController.extend({
+      needs: ["user"],
+      user: Ember.computed.alias("controllers.user")
+    });
+
+    Github.RepositoryController = Ember.ArrayController.extend({
+      needs: ["user"],
+      user: Ember.computed.alias("controllers.user")
+    });
+
+</script>
